@@ -11,13 +11,23 @@ CameraChunkLoader - Simple script to drop on your main Camera (or wherever). Kee
 
 
 To Get Started:
+
 -Bring these scripts into Unity.
+
 -Make a grid for tilemaps.
+
 -On said grid, make tilemaps for: Foreground tiles, Background tiles, and Ore 'tiles'
+
 -Make an empty WorldGen object in your world, drag and drop the Worldgen script into it,
+
 -Drag and drop your grid and tilemaps into the matching fields at the top of the WorldGen component.
+
 -Similarly give your FG & BG tile fields one tile for the top layer and a second for your stone layer.
+
 -Now drag and drop the CameraChunkLoader onto an existant gameObject; I did so on the main camera itself.
+
 -In the CameraChunkLoader script component, drag and drop your WorldGen object.
-	-Note: You may need to manually set your tilesize in the camera chunk list; it needs to know how big your tiles are in Unity-measurements to measure distance to create new blocks.
+	
+ -Note: You may need to manually set your tilesize in the camera chunk list; it needs to know how big your tiles are in Unity-measurements to measure distance to create new blocks.
+
 -Press play and test! You should be able to drag the main camera around (or attach it to a player character!) and watch the world generate and be destroyed as you do so!
