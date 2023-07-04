@@ -5,61 +5,74 @@ using UnityEngine.Tilemaps;
 
 public class WorldGen : MonoBehaviour {
 
-    public Grid grid; //Main tile grid
-    public TileBase[] fgTiles; //Foreground tiles
-    public TileBase[] bgTiles; //Background tiles
-    public Tilemap oreMap; //Ore/Overlay tilemap
-	public Tilemap fgMap; //Foreground tilemap
-    public Tilemap bgMap; //Background tilemap
+	[SerializeField]
+    private Grid grid; //Main tile grid
+	[SerializeField]
+    private TileBase[] fgTiles, //Foreground tiles
+						bgTiles; //Background tiles
+	[SerializeField]
+	private Tilemap oreMap, //Ore/Overlay tilemap
+                    fgMap, //Foreground tilemap
+                    bgMap; //Background tilemap
 	//public GameObject plant; //An example game object 'plant' to test placing.
 
-
-	public int surfaceY; //The current surface height of the location we're calculating.
-	public int stoneY; //The height at which the stone layer begins.
-    public int bgsurfaceY;
-    public int bgstoneY;
-
-	[Header("Octave 1")]
-	public float seed; //Seed is the random number the noise starts from.
-	public float octave1Scale; //The scale, or how 'zoomed in' you are on the Perlin Noise, affects how smooth or bumpy the terrain is.
-    public float bgOctave1Scale; //Scale but for the background layer.
-    public float o1Ratio; //The ratio is the percentage of how much this octave affects the final result. All the ratios together have to add up to 1!
+	[Header("Octave 1")] //Octave 1 is the most "zoomed in" one, and therefor the smoothest; defines the overall shape of the landscape.
+	[SerializeField]
+	private float seed; //Seed is the random number the noise starts from.
+	[SerializeField]
+	private float octave1Scale, //The scale, or how 'zoomed in' you are on the Perlin Noise, affects how smooth or bumpy the terrain is.
+					bgOctave1Scale, //Scale but for the background layer.
+					o1Ratio; //The ratio is the percentage of how much this octave affects the final result. All the ratios together have to add up to 1!
 	private float o1Result;
     private float bgo1Result;
 
-    [Header("Octave 2")]
-	public float o2Seed; 
-	public float octave2Scale;
-    public float bgOctave2Scale;
-    public float o2Ratio;
-	private float o2Result;
+	[Header("Octave 2")] //Octave 2 is more "zoomed out", so perlin features are smaller and more hill/bump-like. Medium size for bumps and hills. Lower ratio than 1 so it's more an 'accent' or suggestion of features.
+	[SerializeField]
+	private float o2Seed;
+    [SerializeField]
+    private float octave2Scale, 
+                    bgOctave2Scale, 
+                    o2Ratio; 
+    private float o2Result;
     private float bgo2Result;
 
-    [Header("Octave 3")]
-	public float o3Seed;
-	public float octave3Scale;
-    public float bgOctave3Scale;
-    public float o3Ratio;
-	private float o3Result;
+	[Header("Octave 3")] //Octave 3: like 2 but even moreso. More lumpy, spiky, smaller features, etc.
+	[SerializeField]
+	private float o3Seed;
+    [SerializeField]
+    private float octave3Scale,
+                    bgOctave3Scale,
+                    o3Ratio;
+    private float o3Result;
     private float bgo3Result;
 
     [Header("Height Adjuster")] //Kind of an octave but instead of altering the main height map, it affects the general height of the whole result at tile generation time.
-	public float heightASeed;
-	public float heightAScale;
-	private int heightAResult;
-	public float heightMultiplier; //What we multiply the heightAResult by. Height Adjustment is the...elevation of the terrain, and not so much its general smaller features.
-
+	[SerializeField]
+	private float heightASeed,
+					heightAScale,
+					heightMultiplier; //What we multiply the heightAResult by. Height Adjustment is the...elevation of the terrain, and not so much its general smaller features.
+    private int heightAResult;
+	
 	[Header("Octave Crossfader")] //This is for adjusting the ratio of the existing octaves with MORE PERLIN NOISE 
-	public float crossfadeSeed;
-	public float crossfadeScale;
-	private float crossfadeResult;
-	public float crossfadeRange; //How far the crossfade can push and pull the ratios of the octaves.
+	[SerializeField]
+	private float crossfadeSeed,
+				crossfadeScale,
+				crossfadeRange; //How far the crossfade can push and pull the ratios of the octaves.
+    private float crossfadeResult;
 
 	[Header("Testing Environment")] //Stuff just for testing!
-	public int worldWidth; //Size of initial area to generate.
-	public int worldHeight;
+	[SerializeField]
+	private int worldWidth; //Size of initial area to generate.
+    [SerializeField]
+    private int worldHeight;
 
     List<WorldChunk> activeChunks = new List<WorldChunk>(); //For keeping track of live/visible chunks
+
+    private int surfaceY, //The working surface height of the location we're calculating.
+				stoneY, //The height at which the stone layer begins.
+				bgsurfaceY,
+				bgstoneY;
+
 
     void Start () 
 	{
@@ -106,6 +119,7 @@ public class WorldGen : MonoBehaviour {
 
 	//TO DO: Actually explain how all of this malarky works in detail!
 	//Caves, ores, biomes, plant/entity generation.
+	//Try Async on chunkgen, possibly BurstCompile as well.
 
     //Feed ChunkGen the X, Y of the chunk and it feeds back the tiles to make in that chunk! //NOTE TO SELF: Review BurstCompile for some of these things
     public void ChunkGen(int chunkX, int chunkY) 
@@ -154,7 +168,7 @@ public class WorldGen : MonoBehaviour {
                     //Record current X,Y position in chunk.
                     workingChunk.chunkTilePositions[arrayLoc] = new Vector3Int(worldX,(chunkY * 16) + workingY,0); 
 
-					stoneY = surfaceY - 5;
+					stoneY = surfaceY - 5; //Temporary solution!
 
                     //You're above stone but below surface, so it's dirt.
                     if (worldY > stoneY) 
@@ -195,6 +209,7 @@ public class WorldGen : MonoBehaviour {
         activeChunks.Add(workingChunk);
     }
 
+	//Comment goes here
     public void RemoveChunk(WorldChunk deletedChunk){
 		foreach(Vector3Int tilePos in deletedChunk.chunkTilePositions) {
 			fgMap.SetTile(tilePos, null);
@@ -202,6 +217,7 @@ public class WorldGen : MonoBehaviour {
         }
     }
 	
+	//Comment goes here
 	public void GenerateChunksFrom(int chunkX, int chunkY, int viewDistance)
 	{
         List<Vector2Int> chunksToGen = new List<Vector2Int>();
@@ -228,6 +244,7 @@ public class WorldGen : MonoBehaviour {
 		chunksToGen = null;
     }
 
+	//Comment goes here
 	public void CleanupChunks(int chunkX, int chunkY, int viewDistance){
 
         List<WorldChunk> chunksToKill = new List<WorldChunk>();
