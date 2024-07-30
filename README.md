@@ -3,11 +3,17 @@ A simple set of C# scripts that generates a 2D world using perlin noise and Unit
 
 Hey! Here's my world generation scripts; currently the results are very simple, but will hopefully lay the ground for something more comprehensive later on.
 
-WorldGen.cs - The script that does all the work of generating 2D tile based terrain; right now it uses multiple sets of perlin noise at different scales to generate a basic 2D height map. Worlds are divided into 16x16 tile chunks, which this script has the functions for generating, cleaning up, etc.
+WorldGen.cs - A static script with all the math for making terrain data.
 
-WorldChunk.cs - Class definition for our chunks!
+TileHandler.cs - Drop this on a game object and point it to the resources it needs, and it'll pull data from WorldGen to make tile-based terrain!
 
-CameraChunkLoader - Simple script to drop on your main Camera (or wherever). Keeps track of where the camera is and handles loading/unloading chunks around it as it moves.
+Biome.cs - Class definition for biomes -- which at this time are just a collection of octaves that define how the terrain generates.
+
+Octave.cs - Class definition for octaves -- data that defines the details of one heightmap (of which our terrain map is comprised of four or more, overlayed to make interesting combinations).
+
+WorldChunk.cs - Class definition for our chunks! Tiles, and their positions, etc. Currently formatted to work with Unity's tile system.
+
+BiomeVisualizer.cs - An editor script that helps visualize terrain generation, right from the comfort of your Unity editor (Under >Window)! Freely edit the octave variables and click visualize to quickly and easily test 'em out!
 
 
 To Get Started:
@@ -16,18 +22,11 @@ To Get Started:
 
 -Make a grid for tilemaps.
 
--On said grid, make tilemaps for: Foreground tiles, Background tiles, and Ore 'tiles'
+-On said grid, make a Foreground tilemap.
 
--Make an empty WorldGen object in your world, drag and drop the Worldgen script into it,
+-Drag and drop your TileHandler script onto your grid (or any item in the scene, really). Designate in it your tilemap, tile grid, and one tile (a regular tile or a fancy rule tile -- your pick.)
 
--Drag and drop your grid and tilemaps into the matching fields at the top of the WorldGen component.
+-Press play and check our your tile-based terrain! Or just Hit > Window > Biome Visualizer.
 
--Similarly give your FG & BG tile fields one tile for the top layer and a second for your stone layer.
 
--Now drag and drop the CameraChunkLoader onto an existant gameObject; I did so on the main camera itself.
-
--In the CameraChunkLoader script component, drag and drop your WorldGen object.
-	
- -Note: You may need to manually set your tilesize in the camera chunk list; it needs to know how big your tiles are in Unity-measurements to measure distance to create new blocks.
-
--Press play and test! You should be able to drag the main camera around (or attach it to a player character!) and watch the world generate and be destroyed as you do so!
+I have a lot on my to-do list for this, so please keep an eye out for updates!
